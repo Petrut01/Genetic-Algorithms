@@ -65,11 +65,12 @@ def binary_search(x): #cautare binara pt a afla prima valoare mai mare decat un 
             high = mid - 1
     return low
 
-def select_chromosome(population, x, f):
+def select_chromosome(population, x, f, j):
     for i in range(dimension):
         u = random.uniform()
         selected_chromosomes.append(binary_search(u))
-        file.write('\nu=' + str(u) + ' selectam cromozomul ' + str(selected_chromosomes[i]))
+        if j == 0:
+            file.write('\nu=' + str(u) + ' selectam cromozomul ' + str(selected_chromosomes[i]))
     population1 = [[ 0 for _ in range(length)] for y in range(dimension)]
     x1 = [0 for _ in range(dimension)]
     f1 = [0 for _ in range(dimension)]
@@ -81,18 +82,21 @@ def select_chromosome(population, x, f):
     population = population1
     x = x1
     f = f1
-    file.write('\nDupa selectie:\n')
-    for i in range(dimension):
-        file.write(str(i + 1) + ": " + ''.join(map(str, population[i])) + ' x= ' + str(x[i]) + ' f=' + str(f[i]) + '\n')
+    if j == 0:
+        file.write('\nDupa selectie:\n')
+        for i in range(dimension):
+            file.write(str(i + 1) + ": " + ''.join(map(str, population[i])) + ' x= ' + str(x[i]) + ' f=' + str(f[i]) + '\n')
 
     participants = []
-    file.write('\nProbabilitatea de incrucisare ' + str(crossover_probability))
+    if j == 0:
+        file.write('\nProbabilitatea de incrucisare ' + str(crossover_probability))
     for i in range(dimension):
         u = random.uniform()
         if u < crossover_probability :
-            file.write('\n' + str(i+1) + ': ' + ''.join(map(str, population[i])) + ' u= ' + str(u) + ' < ' + str(crossover_probability) + ' participa')
+            if j == 0:
+                file.write('\n' + str(i+1) + ': ' + ''.join(map(str, population[i])) + ' u= ' + str(u) + ' < ' + str(crossover_probability) + ' participa')
             participants.append(i)
-        else :
+        elif j == 0:
             file.write('\n' + str(i + 1) + ': ' + ''.join(map(str, population[i])) + ' u= ' + str(u))
 
     while len(participants) > 1:
@@ -101,70 +105,34 @@ def select_chromosome(population, x, f):
         cr2 = random.choice(participants)
         participants.remove(cr2)
         pct = random.randint(0,length)
-        file.write('\n Recombinare dintre cromozomul ' + str(cr1+1) + ' cu cromozomul '+ str(cr2+1) + ':\n')
-        file.write(''.join(map(str, population[cr1])) + ' ' + ''.join(map(str, population[cr2])) + ' punct ' + str(pct)+ '\n')
+        if j == 0:
+            file.write('\n Recombinare dintre cromozomul ' + str(cr1+1) + ' cu cromozomul '+ str(cr2+1) + ':\n')
+            file.write(''.join(map(str, population[cr1])) + ' ' + ''.join(map(str, population[cr2])) + ' punct ' + str(pct)+ '\n')
         for i in range(pct):
             population[cr1][i], population[cr2][i] = population[cr2][i], population[cr1][i]
-        file.write('Rezultat   ' + ''.join(map(str, population[cr1])) + ' ' + ''.join(map(str, population[cr2])))
+        if j == 0:
+            file.write('Rezultat   ' + ''.join(map(str, population[cr1])) + ' ' + ''.join(map(str, population[cr2])))
     return population
 
 
-def select_chromosome2(population, x, f): #aceeasi functie cu select_chromosome doar ca fara afisari
-    for i in range(dimension):
-        u = random.uniform()
-        selected_chromosomes.append(binary_search(u)) #gaseste intervalul corespunzator lui u
-    population1 = [[0 for z in range(length)] for y in range(dimension)]
-    x1 = [0 for x in range(dimension)]
-    f1 = [0 for x in range(dimension)]
-    for i in range(dimension): #copiaza cromozomii selectati din populatia initiala
-        population1[i] = population[selected_chromosomes[i]-1]
-        x1[i] = x[selected_chromosomes[i]-1]
-        f1[i] = f[selected_chromosomes[i]-1]
 
-    population = population1 #ii pune in populatia initiala
-    x = x1
-    f = f1
-
-    participants = []
-    for i in range(dimension):
-        u = random.uniform()
-        if u < crossover_probability: # alege participantii la crossover
-            participants.append(i)
-
-    while len(participants) > 1:
-        cr1 = random.choice(participants)
-        participants.remove(cr1)
-        cr2 = random.choice(participants)
-        participants.remove(cr2)
-        pct = random.randint(0, length) #alege un punct de rupere
-        for i in range(pct):
-            population[cr1][i], population[cr2][i] = population[cr2][i], population[cr1][i] #interschimba genele pana la punctul de rupere
-    return population
-
-
-def generate_mutations():
+def generate_mutations(j):
     k = 0
     for i in range(dimension):
         u = random.uniform() #genereaza o variabila uniforma u
         if u < mutation_probability:
-            if k == 0:
-                file.write('\nProbabilitate de mutatie pentru fiecare gena ' + str(mutation_probability))
-                file.write('\nAu fost modificati cromozomii:\n' + str(i+1))
-                k += 1
-            else:
-                file.write('\n' + str(i+1))
+            if j == 0:
+                if k == 0:
+                    file.write('\nProbabilitate de mutatie pentru fiecare gena ' + str(mutation_probability))
+                    file.write('\nAu fost modificati cromozomii:\n' + str(i+1))
+                    k += 1
+                else:
+                    file.write('\n' + str(i+1))
             p = random.randint(0, length) #genereaza o pozitie aleatoare
             population[i][p] = (population[i][p] + 1) % 2 #trece gena la complement
-    file.write('\n')
-
+    if j == 0:
+        file.write('\n')
     return k
-
-def generate_mutations2(): #aceeasi functie ca generate_mutations doar ca fara afisari
-    for i in range(dimension):
-        u = random.uniform()
-        if u < mutation_probability:
-            p = random.randint(0, length)
-            population[i][p] = (population[i][p] + 1) % 2
 
 
 
@@ -180,7 +148,7 @@ file.write('\nIntervale probabilitati selectie\n')
 for i in range(dimension+1):
     file.write(str(intervals[i])+' ')
 
-population = select_chromosome(population, x, f)
+population = select_chromosome(population, x, f, 0)
 
 file.write('\n\nDupa recombinare:\n')
 generate_value() #decodific noii cromozomi
@@ -188,7 +156,7 @@ apply_function()
 for i in range(dimension):
     file.write(str(i + 1) + ": " + ''.join(map(str, population[i])) + ' x= ' + str(x[i]) + ' f=' + str(f[i]) + '\n')
 
-if(generate_mutations()): #daca s-au produs mutatii decodific din nou si calculez f(x)
+if(generate_mutations(0)): #daca s-au produs mutatii decodific din nou si calculez f(x)
     generate_value()
     apply_function()
     file.write('\nDupa mutatie:\n')
@@ -201,13 +169,13 @@ file.write('\nElementul elitist este:\n')
 file.write(str(ind + 1) + ": " + ''.join(map(str, population[ind])) + ' x= ' + str(x[ind]) + ' f=' + str(f[ind]) + '\n')
 
 file.write('\nEvolutia maximului')
-for i in range(nr_generations-1):
+for i in range(1, nr_generations):
     sum_f = sum(f)
     calc_intervals(sum_f)
-    population = select_chromosome2(population, x, f)
+    population = select_chromosome(population, x, f, i)
     generate_value()
     apply_function()
-    generate_mutations2()
+    generate_mutations(i)
     generate_value()
     apply_function()
     if max_f < max(f):
